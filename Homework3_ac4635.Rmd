@@ -1,0 +1,20 @@
+---
+title: "Homework 3"
+author: "JR Chansakul"
+date: 2020-10-05
+output: github_document
+  
+---
+
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+## Problem 1
+
+## Problem 2
+
+## Problem 3
+
+
