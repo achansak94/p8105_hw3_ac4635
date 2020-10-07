@@ -105,4 +105,40 @@ instacart %>%
 
 ## Problem 2
 
+## Problem 2 part 1
+
+``` r
+##Tidy and Wrangle Dataset
+tidy_accel_df=
+  read.csv("./data/accel_data.csv") %>%
+  janitor::clean_names() %>%
+  pivot_longer(
+          activity_1:activity_1440,
+          names_to = "activity_minutes", 
+          names_prefix = "activity_",
+          values_to = "activity_count") %>% 
+  mutate(Weekdays = 
+           case_when(day %in% c("Saturday", "Sunday") ~ "weekend",
+                     day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~  "weekday"),
+           day = fct_relevel(day, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  mutate(activity_minutes = as.numeric(activity_minutes)) %>%
+  view ()
+
+# View variable types of final dataset
+
+view(tidy_accel_df)
+sapply(tidy_accel_df, class) 
+```
+
+    ##             week           day_id              day activity_minutes 
+    ##        "integer"        "integer"         "factor"        "numeric" 
+    ##   activity_count         Weekdays 
+    ##        "numeric"      "character"
+
+y format to long format group by and summarize problem geomline to
+connect the dots x minutes on x-axissand activity count on y-axis only 1
+plot
+
 ## Problem 3
+
+data manipulation steps and then plotting
