@@ -149,10 +149,10 @@ their variable types are integer, integer, factor, numeric, numeric,
 character, respectively.
 
 We have 35 days of activity count data collected from the 65 year-old
-male by minute. We have the week variable that denotes the week that
+male by minute. We have the `week` variable that denotes the week that
 that accelerometer data was collected and the newly generated factor
-variable of weekday, which denotes whether the data collected was on a
-weekend or a weekday.
+variable of `weekdays`, which denotes whether the data collected was on
+a weekend or a weekday.
 
 ## Problem 2 part 2
 
@@ -242,20 +242,35 @@ tidy_accel_df %>%
   geom_line() + 
   labs(
         title = "Activity Level Per Minute",
-        x = "Time in minutes",
-        y = "Level of Activity") + 
+        x = "Time",
+        y = "Level of Activity") +
   scale_x_continuous(
     breaks = c(0, 360, 720, 1080, 1440), 
-    labels = c("12AM", "6AM", "12PM", "6PM", "11:59PM"),
-    limits = c(0, 1440)
-    ) +
+    labels = c("12AM","6AM","12PM", "6PM","12AM"),
+    limits = c(0, 1440)) +
     viridis::scale_color_viridis(
       name = "Day",
-      discrete = TRUE) + 
-  theme(legend.position = "bottom")
+      discrete = TRUE)+ 
+  theme_set(theme_minimal() + theme(legend.position = "bottom")) +   
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1)) + 
+  facet_grid(. ~ day)
 ```
 
-<img src="Homework3_ac4635_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
+<img src="Homework3_ac4635_files/figure-gfm/Activity_Per_Day_Plot-1.png" width="90%" />
+
+``` r
+ggsave("./plots/accel_plot.pdf", height = 4, width = 6) 
+```
+
+We can conclude from this graphic that our patient had increased
+activity between 6:00pm and 10:00pm on Monday, Wednesday, Friday and
+Saturday suggesting he may go on exercise on socializing with friends on
+these evenings. The patient seems to have morning activites between
+6:00am and 9:00am from Wednesday, Thursday and Saturday. Additionally,
+the lowest acitvity times are between 11:00pm and 6:00am suggesting that
+the patient gets roughly 6-7 hours of sleep or downtime a week.
+
+## Problem 3
 
 ``` r
 noaa_data <- p8105.datasets::ny_noaa %>% 
@@ -265,7 +280,5 @@ noaa_data <- p8105.datasets::ny_noaa %>%
 y format to long format group by and summarize problem geomline to
 connect the dots x minutes on x-axissand activity count on y-axis only 1
 plot
-
-## Problem 3
 
 data manipulation steps and then plotting

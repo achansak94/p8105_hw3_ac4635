@@ -125,7 +125,7 @@ sapply(tidy_accel_df, class) %>% view ()
 
 The accelerometer dataset contains daily information of “activity counts” in one-minute intervals of a 63 year-old male with BMI 25, who was admitted to Columbia University Medical Center and diagnosed with congestive heart failure (CHF). The tidied dataset contains `r ncol(tidy_accel_df)` variables and `r nrow(tidy_accel_df)` rows or observations.The variables of included in the dataset are `r names(tidy_accel_df)` and their variable types are `r sapply(tidy_accel_df, class)`, respectively.
 
-We have `r n_distinct(pull(tidy_accel_df, day_id))` days of activity count data collected from the 65 year-old male by minute. We have the week variable that denotes the week that that accelerometer data was collected and the newly generated factor variable of weekday, which denotes whether the data collected was on a weekend or a weekday.
+We have `r n_distinct(pull(tidy_accel_df, day_id))` days of activity count data collected from the 65 year-old male by minute. We have the `week` variable that denotes the week that that accelerometer data was collected and the newly generated factor variable of `weekdays`, which denotes whether the data collected was on a weekend or a weekday.
 
 ## Problem 2 part 2
 
@@ -159,31 +159,31 @@ The 63 year old male has a mean activity count per day of `r mean(pull(Total_act
 
 Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
 
-
-```{r}
+```{r Activity_Per_Day_Plot}
 tidy_accel_df %>% 
   ggplot(aes(x = activity_minute, y = activity_count, color = day)) + 
   geom_line() + 
   labs(
         title = "Activity Level Per Minute",
-        x = "Time in minutes",
-        y = "Level of Activity") + 
+        x = "Time",
+        y = "Level of Activity") +
   scale_x_continuous(
     breaks = c(0, 360, 720, 1080, 1440), 
-    labels = c("12AM", "6AM", "12PM", "6PM", "11:59PM"),
-    limits = c(0, 1440)
-    ) +
+    labels = c("12AM","6AM","12PM", "6PM","12AM"),
+    limits = c(0, 1440)) +
     viridis::scale_color_viridis(
       name = "Day",
-      discrete = TRUE) + 
-  theme(legend.position = "bottom")
+      discrete = TRUE)+ 
+  theme_set(theme_minimal() + theme(legend.position = "bottom")) +   
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1)) + 
+  facet_grid(. ~ day)
 
-
-
+ggsave("./plots/accel_plot.pdf", height = 4, width = 6) 
 ```
 
+We can conclude from this graphic that our patient had increased activity between 6:00pm and 10:00pm on Monday, Wednesday, Friday and Saturday suggesting he may go on exercise on socializing with friends on these evenings. The patient seems to have morning activites between 6:00am and 9:00am from Wednesday, Thursday and Saturday. Additionally, the lowest acitvity times are between 11:00pm and 6:00am suggesting that the patient gets roughly 6-7 hours of sleep or downtime a week. 
 
-
+## Problem 3
 ```{r}
 noaa_data <- p8105.datasets::ny_noaa %>% 
   janitor::clean_names() 
@@ -202,7 +202,7 @@ only 1 plot
 
 
 
-## Problem 3
+
 
 data manipulation steps and then plotting 
 
