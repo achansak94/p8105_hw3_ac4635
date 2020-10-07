@@ -107,6 +107,12 @@ instacart %>%
 
 ## Problem 2 part 1
 
+Load, tidy, and otherwise wrangle the data. Your final dataset should
+include all originally observed variables and values; have useful
+variable names; include a weekday vs weekend variable; and encode data
+with reasonable variable classes. Describe the resulting dataset
+(e.g. what variables exist, how many observations, etc).
+
 ``` r
 ##Tidy and Wrangle Dataset
 tidy_accel_df=
@@ -114,26 +120,95 @@ tidy_accel_df=
   janitor::clean_names() %>%
   pivot_longer(
           activity_1:activity_1440,
-          names_to = "activity_minutes", 
+          names_to = "activity_minute", 
           names_prefix = "activity_",
           values_to = "activity_count") %>% 
-  mutate(Weekdays = 
-           case_when(day %in% c("Saturday", "Sunday") ~ "weekend",
-                     day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~  "weekday"),
-           day = fct_relevel(day, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
-  mutate(activity_minutes = as.numeric(activity_minutes)) %>%
+  mutate(
+    Weekdays = 
+      case_when(day %in% c("Saturday", "Sunday") ~ "weekend",
+                day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~  "weekday")) %>%
+  mutate(
+      activity_minute = as.numeric(activity_minute),
+      day = factor(day),
+      day = fct_relevel(day, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
   view ()
 
 # View variable types of final dataset
 
-view(tidy_accel_df)
-sapply(tidy_accel_df, class) 
+view(tidy_accel_df) %>% view ()
+sapply(tidy_accel_df, class) %>% view ()
 ```
 
-    ##             week           day_id              day activity_minutes 
-    ##        "integer"        "integer"         "factor"        "numeric" 
-    ##   activity_count         Weekdays 
-    ##        "numeric"      "character"
+The accelerometer dataset contains daily information of “activity
+counts” in one-minute intervals of a 63 year-old male with BMI 25, who
+was admitted to Columbia University Medical Center and diagnosed with
+congestive heart failure (CHF). The tidied dataset contains 6 variables
+and 50400 rows or observations.The variables of included in the dataset
+are week, day\_id, day, activity\_minute, activity\_count, Weekdays and
+their variable types are integer, integer, factor, numeric, numeric,
+character, respectively.
+
+We have 35 days of activity count data collected from the 65 year-old
+male by minute. We have the week variable that denotes the week that
+that accelerometer data was collected and the newly generated factor
+variable of weekday, which denotes whether the data collected was on a
+weekend or a weekday.
+
+## Problem 2 part 2
+
+Traditional analyses of accelerometer data focus on the total activity
+over the day. Using your tidied dataset, aggregate accross minutes to
+create a total activity variable for each day, and create a table
+showing these totals. Are any trends apparent?
+
+``` r
+# Double check group_by 
+Total_activity_day = 
+  tidy_accel_df %>% 
+  group_by(day_id, day) %>%
+  mutate(
+    sum_activity_day = sum(activity_count)) %>% 
+  select(week, day_id, day, sum_activity_day) %>% 
+  distinct() %>%
+  knitr::kable() %>%
+  view ()
+```
+
+summarize(total\_activity = sum(activity\_count)) view
+(Total\_activity\_day)
+
+## Problem 2 part 3
+
+Accelerometer data allows the inspection activity over the course of the
+day. Make a single-panel plot that shows the 24-hour activity time
+courses for each day and use color to indicate day of the week. Describe
+in words any patterns or conclusions you can make based on this graph.
+
+``` r
+tidy_accel_df %>% 
+  ggplot(aes(x = activity_minute, y = activity_count, color = day)) + 
+  geom_line() + 
+  labs(
+        title = "Activity Level Per Minute",
+        x = "Time in minutes",
+        y = "Level of Activity") + 
+  scale_x_continuous(
+    breaks = c(0, 360, 720, 1080, 1440), 
+    labels = c("12AM", "6AM", "12PM", "6PM", "11:59PM"),
+    limits = c(0, 1440)
+    ) +
+    viridis::scale_color_viridis(
+      name = "Day",
+      discrete = TRUE) + 
+  theme(legend.position = "bottom")
+```
+
+<img src="Homework3_ac4635_files/figure-gfm/unnamed-chunk-7-1.png" width="90%" />
+
+``` r
+noaa_data <- p8105.datasets::ny_noaa %>% 
+  janitor::clean_names() 
+```
 
 y format to long format group by and summarize problem geomline to
 connect the dots x minutes on x-axissand activity count on y-axis only 1
