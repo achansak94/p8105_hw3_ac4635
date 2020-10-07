@@ -131,24 +131,29 @@ We have `r n_distinct(pull(tidy_accel_df, day_id))` days of activity count data 
 
 Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
 
-```{r}
+```{r Daily_Activity_Count}
 
-# Double check group_by 
 Total_activity_day = 
   tidy_accel_df %>% 
-  group_by(day_id, day) %>%
+    group_by(week, day) %>%
   mutate(
-    sum_activity_day = sum(activity_count)) %>% 
-  select(week, day_id, day, sum_activity_day) %>% 
+    sum_activity_day = sum(activity_count),
+    sum_activity_day = as.numeric(sum_activity_day)) %>% 
+  select(week, day, sum_activity_day) %>% 
   distinct() %>%
-  knitr::kable() %>%
+  arrange (week, day) %>%
+  relocate (week, day) %>%
   view ()
 
- 
-```
- summarize(total_activity = sum(activity_count))
-  view (Total_activity_day)
+# View in table format 
+Total_activity_day %>% 
+knitr::kable()
 
+# View variable types in dataset 
+sapply(Total_activity_day, class) %>% view ()
+```
+
+The 63 year old male has a mean activity count per day of `r mean(pull(Total_activity_day, sum_activity_day))` with a standard deviation of `r sd(pull(Total_activity_day, sum_activity_day))` that ranges from `r min(pull(Total_activity_day, sum_activity_day))` to `r max(pull(Total_activity_day, sum_activity_day))`. His activity count seems to increase the first two weeks and then decline for the next two weeks. On week 5, the activity count seems to increase again. However, the two Saturdays on weeks 4 and 5 were his lowest activity count days at 1440. 
 
 ## Problem 2 part 3
 

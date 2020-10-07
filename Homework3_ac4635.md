@@ -162,20 +162,72 @@ create a total activity variable for each day, and create a table
 showing these totals. Are any trends apparent?
 
 ``` r
-# Double check group_by 
 Total_activity_day = 
   tidy_accel_df %>% 
-  group_by(day_id, day) %>%
+    group_by(week, day) %>%
   mutate(
-    sum_activity_day = sum(activity_count)) %>% 
-  select(week, day_id, day, sum_activity_day) %>% 
+    sum_activity_day = sum(activity_count),
+    sum_activity_day = as.numeric(sum_activity_day)) %>% 
+  select(week, day, sum_activity_day) %>% 
   distinct() %>%
-  knitr::kable() %>%
+  arrange (week, day) %>%
+  relocate (week, day) %>%
   view ()
+
+# View in table format 
+Total_activity_day %>% 
+knitr::kable()
 ```
 
-summarize(total\_activity = sum(activity\_count)) view
-(Total\_activity\_day)
+| week | day       | sum\_activity\_day |
+| ---: | :-------- | -----------------: |
+|    1 | Monday    |           78828.07 |
+|    1 | Tuesday   |          307094.24 |
+|    1 | Wednesday |          340115.01 |
+|    1 | Thursday  |          355923.64 |
+|    1 | Friday    |          480542.62 |
+|    1 | Saturday  |          376254.00 |
+|    1 | Sunday    |          631105.00 |
+|    2 | Monday    |          295431.00 |
+|    2 | Tuesday   |          423245.00 |
+|    2 | Wednesday |          440962.00 |
+|    2 | Thursday  |          474048.00 |
+|    2 | Friday    |          568839.00 |
+|    2 | Saturday  |          607175.00 |
+|    2 | Sunday    |          422018.00 |
+|    3 | Monday    |          685910.00 |
+|    3 | Tuesday   |          381507.00 |
+|    3 | Wednesday |          468869.00 |
+|    3 | Thursday  |          371230.00 |
+|    3 | Friday    |          467420.00 |
+|    3 | Saturday  |          382928.00 |
+|    3 | Sunday    |          467052.00 |
+|    4 | Monday    |          409450.00 |
+|    4 | Tuesday   |          319568.00 |
+|    4 | Wednesday |          434460.00 |
+|    4 | Thursday  |          340291.00 |
+|    4 | Friday    |          154049.00 |
+|    4 | Saturday  |            1440.00 |
+|    4 | Sunday    |          260617.00 |
+|    5 | Monday    |          389080.00 |
+|    5 | Tuesday   |          367824.00 |
+|    5 | Wednesday |          445366.00 |
+|    5 | Thursday  |          549658.00 |
+|    5 | Friday    |          620860.00 |
+|    5 | Saturday  |            1440.00 |
+|    5 | Sunday    |          138421.00 |
+
+``` r
+# View variable types in dataset 
+sapply(Total_activity_day, class) %>% view ()
+```
+
+The 63 year old male has a mean activity count per day of
+3.845434510^{5} with a standard deviation of 1.634817310^{5} that ranges
+from 1440 to 6.859110^{5}. His activity count seems to increase the
+first two weeks and then decline for the next two weeks. On week 5, the
+activity count seems to increase again. However, the two Saturdays on
+weeks 4 and 5 were his lowest activity count days at 1440.
 
 ## Problem 2 part 3
 
@@ -203,7 +255,7 @@ tidy_accel_df %>%
   theme(legend.position = "bottom")
 ```
 
-<img src="Homework3_ac4635_files/figure-gfm/unnamed-chunk-7-1.png" width="90%" />
+<img src="Homework3_ac4635_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
 
 ``` r
 noaa_data <- p8105.datasets::ny_noaa %>% 
