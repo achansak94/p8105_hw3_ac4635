@@ -414,7 +414,8 @@ noaa_data %>%
 I separated date into year, month and day as well as converted
 precipitation to mm, tmax to C, and tmin to C by dividing by 10. I found
 that the most commonly observed snowfall value is 0. This is most likely
-due to snow only occurring in the winter.
+due to snow only occurring in the winter and some years may not have
+snow.
 
 ## Problem 3 Part C
 
@@ -423,19 +424,58 @@ in July in each station across years. Is there any observable /
 interpretable structure? Any outliers?
 
 ``` r
+# View part of Dataset
+noaa_data %>% slice (1:1000) %>%
+  view
+
+# Two-panel Plot
 noaa_data %>% 
-  
-  ggplot(aes(x = year, y = tmax, fill = month)) + 
-  geom_line() + 
+  filter(month %in% c("01","07")) %>% 
+  group_by(id, month, year) %>% 
+  summarize(avg_tmax = mean(tmax, na.rm = TRUE)) %>% 
+  mutate(
+    month = as.numeric(month),
+    month = month.abb[month]) %>% 
+  select(id, year, month, avg_tmax) %>%
+  ggplot(aes(x = year, y = avg_tmax, color = month)) + 
+  geom_point(alpha = 0.6) +
+  geom_line(alpha = 0.5) +
+  geom_smooth(alpha = 0.3)+
   labs(
-        title = "Average Max Temp in each station across years",
+        title = "Avg. Max Temp. of each station across years",
         x = "Year",
-        y = "Average Max Temperature (C)")
+        y = "Average Max Temperature (C)") +          
+  scale_color_manual(values=c("blue", "red")) +
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1),
+        legend.position = "right") +
+  scale_x_discrete(breaks = seq(1981, 2010, 3))
 ```
 
-    ## Warning: Removed 294199 row(s) containing missing values (geom_path).
+    ## `summarise()` regrouping output by 'id', 'month' (override with `.groups` argument)
 
-<img src="Homework3_ac4635_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+    ## Warning: Removed 5970 rows containing non-finite values (stat_smooth).
+
+    ## Warning: Removed 5970 rows containing missing values (geom_point).
+
+    ## Warning: Removed 1492 row(s) containing missing values (geom_path).
+
+<img src="Homework3_ac4635_files/figure-gfm/Two_Panel_Plot-1.png" width="90%" />
+
+Overall, the average maximum temperature in July is warmer than the
+average maximum temperature in January across the 30 years. In January,
+the average maximum temperature fluctuates between -10 to 10 degrees
+Celsius, while the average maximum temperature in July fluctuates
+between +20 and +30 degress Celsius.
+
+We observat that the recorded temperatures from the different stations
+can vary as seen with the outliers. For example, one station in July,
+1988 recorded a much lower temperature than other stations.
+Additionally, we see outliers in January 1982, 2004, and 2005. One
+explanation for some of these outliers might be the location of the
+station as the temperature may vary significantly depending on where the
+station records its data.
 
 ## Problem 3 Part D
 
