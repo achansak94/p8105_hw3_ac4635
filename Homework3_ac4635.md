@@ -252,8 +252,7 @@ tidy_accel_df %>%
       name = "Day",
       discrete = TRUE)+ 
   theme_set(theme_minimal() + theme(legend.position = "bottom")) +   
-  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1)) + 
-  facet_grid(. ~ day)
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1)) 
 ```
 
 <img src="Homework3_ac4635_files/figure-gfm/Activity_Per_Day_Plot-1.png" width="90%" />
@@ -262,7 +261,7 @@ tidy_accel_df %>%
 ggsave("./plots/accel_plot.pdf", height = 4, width = 6) 
 ```
 
-We can conclude from this graphic that our patient had increased
+We can conclude from this busy graphic that our patient had increased
 activity between 6:00pm and 10:00pm on Monday, Wednesday, Friday and
 Saturday suggesting he may go on exercise on socializing with friends on
 these evenings. The patient seems to have morning activites between
@@ -425,6 +424,7 @@ interpretable structure? Any outliers?
 
 ``` r
 noaa_data %>% 
+  
   ggplot(aes(x = year, y = tmax, fill = month)) + 
   geom_line() + 
   labs(

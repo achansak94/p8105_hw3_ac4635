@@ -175,13 +175,12 @@ tidy_accel_df %>%
       name = "Day",
       discrete = TRUE)+ 
   theme_set(theme_minimal() + theme(legend.position = "bottom")) +   
-  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1)) + 
-  facet_grid(. ~ day)
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1)) 
 
 ggsave("./plots/accel_plot.pdf", height = 4, width = 6) 
 ```
 
-We can conclude from this graphic that our patient had increased activity between 6:00pm and 10:00pm on Monday, Wednesday, Friday and Saturday suggesting he may go on exercise on socializing with friends on these evenings. The patient seems to have morning activites between 6:00am and 9:00am from Wednesday, Thursday and Saturday. Additionally, the lowest acitvity times are between 11:00pm and 6:00am suggesting that the patient gets roughly 6-7 hours of sleep or downtime a week. 
+We can conclude from this busy graphic that our patient had increased activity between 6:00pm and 10:00pm on Monday, Wednesday, Friday and Saturday suggesting he may go on exercise on socializing with friends on these evenings. The patient seems to have morning activites between 6:00am and 9:00am from Wednesday, Thursday and Saturday. Additionally, the lowest acitvity times are between 11:00pm and 6:00am suggesting that the patient gets roughly 6-7 hours of sleep or downtime a week. 
 
 ## Problem 3
 
@@ -260,6 +259,7 @@ Make a two-panel plot showing the average max temperature in January and in July
 
 ```{r}
 noaa_data %>% 
+  
   ggplot(aes(x = year, y = tmax, fill = month)) + 
   geom_line() + 
   labs(
