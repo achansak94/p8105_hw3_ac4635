@@ -259,15 +259,27 @@ Make a two-panel plot showing the average max temperature in January and in July
 
 
 ```{r}
-
+noaa_data %>% 
+  ggplot(aes(x = year, y = tmax, fill = month)) + 
+  geom_line() + 
+  labs(
+        title = "Average Max Temp in each station across years",
+        x = "Year",
+        y = "Average Max Temperature (C)")
 ```
 
 
 
 
+## Problem 3 Part D
 
-group by and summarize problem
-geomline to connect the dots 
+Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+
+```{r}
+
+```
+
+
 x minutes on x-axissand activity count on y-axis 
 only 1 plot 
 data manipulation steps and then plotting 
