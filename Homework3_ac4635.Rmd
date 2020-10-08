@@ -123,7 +123,7 @@ view(tidy_accel_df) %>% view ()
 sapply(tidy_accel_df, class) %>% view ()
 ```
 
-The accelerometer dataset contains daily information of “activity counts” in one-minute intervals of a 63 year-old male with BMI 25, who was admitted to Columbia University Medical Center and diagnosed with congestive heart failure (CHF). The tidied dataset contains `r ncol(tidy_accel_df)` variables and `r nrow(tidy_accel_df)` rows or observations.The variables of included in the dataset are `r names(tidy_accel_df)` and their variable types are `r sapply(tidy_accel_df, class)`, respectively.
+The accelerometer dataset contains daily information of “activity counts” in one-minute intervals of a 63 year-old male with BMI 25, who was admitted to Columbia University Medical Center and diagnosed with congestive heart failure (CHF). The tidied dataset contains `r ncol(tidy_accel_df)` variables and `r nrow(tidy_accel_df)` rows or observations.The variables included in the dataset are `r names(tidy_accel_df)` and their variable types are `r sapply(tidy_accel_df, class)`, respectively.
 
 We have `r n_distinct(pull(tidy_accel_df, day_id))` days of activity count data collected from the 65 year-old male by minute. We have the `week` variable that denotes the week that that accelerometer data was collected and the newly generated factor variable of `weekdays`, which denotes whether the data collected was on a weekend or a weekday.
 
@@ -184,26 +184,92 @@ ggsave("./plots/accel_plot.pdf", height = 4, width = 6)
 We can conclude from this graphic that our patient had increased activity between 6:00pm and 10:00pm on Monday, Wednesday, Friday and Saturday suggesting he may go on exercise on socializing with friends on these evenings. The patient seems to have morning activites between 6:00am and 9:00am from Wednesday, Thursday and Saturday. Additionally, the lowest acitvity times are between 11:00pm and 6:00am suggesting that the patient gets roughly 6-7 hours of sleep or downtime a week. 
 
 ## Problem 3
+
+## Problem 3 Part A
+
+Write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. 
+
+```{r Import&Summarize_NOAA}
+
+# Import
+data("ny_noaa")
+
+# Looking at distinct weather station IDs and number of observations
+ny_noaa %>% 
+  group_by(id) %>% 
+  summarize (n())
+
+# Date Range 
+date_summary = ny_noaa %>% 
+  group_by(date) %>% 
+  summarize(n())  
+head(date_summary, 5)
+tail(date_summary, 5)
+
+# Percentage of NA's by column
+colMeans(is.na(ny_noaa))  
+
+# Varialbe Types in dataset
+sapply(ny_noaa, class) %>% view ()
+```
+
+The original NOAA National Climatic Data Center dataset has `r ncol(ny_noaa)` variables and `r nrow(ny_noaa)` observations/rows. The variables included in the dataset are `r names(ny_noaa)` and their variable type is `r sapply(ny_noaa, class)`, respectively.
+
+Below is a brief description of the original variables:
+
+id: Weather station ID
+date: Date of observation
+prcp: Precipitation (tenths of mm)
+snow: Snowfall (mm)
+snwd: Snow depth (mm)
+tmax: Maximum temperature (tenths of degrees C)
+tmin: Minimum temperature (tenths of degrees C)
+
+There are 747 unique weather stations that may provide information on precipitation, snowfall, snow depth, min and max temperature on any given day from 1981-01-01 to 2010-21-31. Unfortunately, we have a lot of missing data. In particular, we found that the `tmin` and `tmax` columns have 43.71% of its observations as NA and 22.80% of the observations for the `snwd` variable as NA. 
+
+## Problem 3 Part B
+
+Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
+
+```{r Clean_NY_NOAA}
+
+#Clean Dataset and Units
+noaa_data = ny_noaa %>% 
+  janitor::clean_names() %>% 
+    separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(
+    prcp = prcp/10,
+    snow = as.numeric(snow),
+    snwd = as.numeric(snwd),
+    tmax = as.numeric(tmax)/10,
+    tmin = as.numeric(tmin)/10)
+
+# Commonly observed Snowfall values
+noaa_data %>% 
+  count(snow) %>% 
+  arrange(desc(n))
+```
+
+I separated date into year, month and day as well as converted precipitation to mm, tmax to C, and tmin to C by dividing by 10. I found that the most commonly observed snowfall  value is 0. This is most likely due to snow only occurring in the winter. 
+
+
+## Problem 3 Part C
+
+Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+
 ```{r}
-noaa_data <- p8105.datasets::ny_noaa %>% 
-  janitor::clean_names() 
+
 ```
 
 
 
 
 
-
-y format to long format 
 group by and summarize problem
 geomline to connect the dots 
 x minutes on x-axissand activity count on y-axis 
 only 1 plot 
-
-
-
-
-
 data manipulation steps and then plotting 
 
 

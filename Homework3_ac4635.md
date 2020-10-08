@@ -143,8 +143,8 @@ The accelerometer dataset contains daily information of “activity
 counts” in one-minute intervals of a 63 year-old male with BMI 25, who
 was admitted to Columbia University Medical Center and diagnosed with
 congestive heart failure (CHF). The tidied dataset contains 6 variables
-and 50400 rows or observations.The variables of included in the dataset
-are week, day\_id, day, activity\_minute, activity\_count, Weekdays and
+and 50400 rows or observations.The variables included in the dataset are
+week, day\_id, day, activity\_minute, activity\_count, Weekdays and
 their variable types are integer, integer, factor, numeric, numeric,
 character, respectively.
 
@@ -272,13 +272,157 @@ the patient gets roughly 6-7 hours of sleep or downtime a week.
 
 ## Problem 3
 
+## Problem 3 Part A
+
+Write a short description of the dataset, noting the size and structure
+of the data, describing some key variables, and indicating the extent to
+which missing data is an issue.
+
 ``` r
-noaa_data <- p8105.datasets::ny_noaa %>% 
-  janitor::clean_names() 
+# Import
+data("ny_noaa")
+
+# Looking at distinct weather station IDs and number of observations
+ny_noaa %>% 
+  group_by(id) %>% 
+  summarize (n())
 ```
 
-y format to long format group by and summarize problem geomline to
-connect the dots x minutes on x-axissand activity count on y-axis only 1
-plot
+    ## `summarise()` ungrouping output (override with `.groups` argument)
 
-data manipulation steps and then plotting
+    ## # A tibble: 747 x 2
+    ##    id          `n()`
+    ##    <chr>       <int>
+    ##  1 US1NYAB0001  1157
+    ##  2 US1NYAB0006   852
+    ##  3 US1NYAB0010   822
+    ##  4 US1NYAB0016   214
+    ##  5 US1NYAB0017   459
+    ##  6 US1NYAB0021   365
+    ##  7 US1NYAB0022   273
+    ##  8 US1NYAB0023   365
+    ##  9 US1NYAB0025   215
+    ## 10 US1NYAL0002   549
+    ## # … with 737 more rows
+
+``` r
+# Date Range 
+date_summary = ny_noaa %>% 
+  group_by(date) %>% 
+  summarize(n())  
+```
+
+    ## `summarise()` ungrouping output (override with `.groups` argument)
+
+``` r
+head(date_summary, 5)
+```
+
+    ## # A tibble: 5 x 2
+    ##   date       `n()`
+    ##   <date>     <int>
+    ## 1 1981-01-01   236
+    ## 2 1981-01-02   236
+    ## 3 1981-01-03   236
+    ## 4 1981-01-04   236
+    ## 5 1981-01-05   236
+
+``` r
+tail(date_summary, 5)
+```
+
+    ## # A tibble: 5 x 2
+    ##   date       `n()`
+    ##   <date>     <int>
+    ## 1 2010-12-27   455
+    ## 2 2010-12-28   455
+    ## 3 2010-12-29   455
+    ## 4 2010-12-30   455
+    ## 5 2010-12-31   455
+
+``` r
+# Percentage of NA's by column
+colMeans(is.na(ny_noaa))  
+```
+
+    ##        id      date      prcp      snow      snwd      tmax      tmin 
+    ## 0.0000000 0.0000000 0.0561958 0.1468960 0.2280331 0.4371025 0.4371264
+
+``` r
+# Varialbe Types in dataset
+sapply(ny_noaa, class) %>% view ()
+```
+
+The original NOAA National Climatic Data Center dataset has 7 variables
+and 2595176 observations/rows. The variables included in the dataset are
+id, date, prcp, snow, snwd, tmax, tmin and their variable type is
+character, Date, integer, integer, integer, character, character,
+respectively.
+
+Below is a brief description of the original variables:
+
+id: Weather station ID date: Date of observation prcp: Precipitation
+(tenths of mm) snow: Snowfall (mm) snwd: Snow depth (mm) tmax: Maximum
+temperature (tenths of degrees C) tmin: Minimum temperature (tenths of
+degrees C)
+
+There are 747 unique weather stations that may provide information on
+precipitation, snowfall, snow depth, min and max temperature on any
+given day from 1981-01-01 to 2010-21-31. Unfortunately, we have a lot of
+missing data. In particular, we found that the `tmin` and `tmax` columns
+have 43.71% of its observations as NA and 22.80% of the observations for
+the `snwd` variable as NA.
+
+## Problem 3 Part B
+
+Create separate variables for year, month, and day. Ensure observations
+for temperature, precipitation, and snowfall are given in reasonable
+units. For snowfall, what are the most commonly observed values? Why?
+
+``` r
+#Clean Dataset and Units
+noaa_data = ny_noaa %>% 
+  janitor::clean_names() %>% 
+    separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(
+    prcp = prcp/10,
+    snow = as.numeric(snow),
+    snwd = as.numeric(snwd),
+    tmax = as.numeric(tmax)/10,
+    tmin = as.numeric(tmin)/10)
+
+# Commonly observed Snowfall values
+noaa_data %>% 
+  count(snow) %>% 
+  arrange(desc(n))
+```
+
+    ## # A tibble: 282 x 2
+    ##     snow       n
+    ##    <dbl>   <int>
+    ##  1     0 2008508
+    ##  2    NA  381221
+    ##  3    25   31022
+    ##  4    13   23095
+    ##  5    51   18274
+    ##  6    76   10173
+    ##  7     8    9962
+    ##  8     5    9748
+    ##  9    38    9197
+    ## 10     3    8790
+    ## # … with 272 more rows
+
+I separated date into year, month and day as well as converted
+precipitation to mm, tmax to C, and tmin to C by dividing by 10. I found
+that the most commonly observed snowfall value is 0. This is most likely
+due to snow only occurring in the winter.
+
+## Problem 3 Part C
+
+Make a two-panel plot showing the average max temperature in January and
+in July in each station across years. Is there any observable /
+interpretable structure? Any outliers?
+
+group by and summarize problem geomline to connect the dots x minutes on
+x-axissand activity count on y-axis only 1 plot data manipulation steps
+and then plotting
