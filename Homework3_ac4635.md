@@ -429,7 +429,7 @@ noaa_data %>% slice (1:1000) %>%
   view
 
 # Two-panel Plot
-noaa_data %>% 
+Avg_Max_Plot= noaa_data %>% 
   filter(month %in% c("01","07")) %>% 
   group_by(id, month, year) %>% 
   summarize(avg_tmax = mean(tmax, na.rm = TRUE)) %>% 
@@ -452,6 +452,10 @@ noaa_data %>%
 ```
 
     ## `summarise()` regrouping output by 'id', 'month' (override with `.groups` argument)
+
+``` r
+Avg_Max_Plot
+```
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -480,9 +484,69 @@ station records its data.
 ## Problem 3 Part D
 
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset
-(note that a scatterplot may not be the best option); and (ii) make a
-plot showing the distribution of snowfall values greater than 0 and less
-than 100 separately by year.
+(note that a scatterplot may not be the best option); (ii) make a plot
+showing the distribution of snowfall values greater than 0 and less than
+100 separately by year.
 
-x minutes on x-axissand activity count on y-axis only 1 plot data
-manipulation steps and then plotting
+``` r
+library(patchwork)
+
+tmin_tmax_plot = 
+  noaa_data %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex(bins=50) +
+  geom_smooth() +
+   labs(
+        title = "Tmin vs Tmax",
+        x = "Max Temperature (C)",
+        y = "Min Temperature (C)") + 
+  viridis::scale_fill_viridis(option = "inferno") +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5))
+  
+tmin_tmax_plot
+```
+
+    ## Warning: Removed 1136276 rows containing non-finite values (stat_binhex).
+
+    ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
+
+    ## Warning: Removed 1136276 rows containing non-finite values (stat_smooth).
+
+<img src="Homework3_ac4635_files/figure-gfm/Tmax_Tmin_Plot-1.png" width="90%" />
+
+``` r
+snowfall_plot = 
+  noaa_data %>% 
+  filter(0 < snow & snow < 100) %>% 
+  ggplot(aes(x = snow, color = factor(year))) +
+  geom_density() +
+  labs(
+    title = "Distribution of NY Snowfall Values (1981-2010)",
+    x = "Snowfall (mm)",
+    y = "Year") +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none")
+
+tmin_tmax_plot + snowfall_plot
+```
+
+    ## Warning: Removed 1136276 rows containing non-finite values (stat_binhex).
+
+    ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
+
+    ## Warning: Removed 1136276 rows containing non-finite values (stat_smooth).
+
+<img src="Homework3_ac4635_files/figure-gfm/Snowfall_Plot-1.png" width="90%" />
+
+On the left pannel, we see a graph that shows `tmin` vs `tmax` for the
+entire dataset. While we observe some outliers around -60 and 60 degrees
+Celsius, most of the points lie between -30 and 30 Celsius on the
+x-axis.
+
+On the right panel, we observe a distribution of snowfall values between
+0 and 100 degrees Celsius. We observe the two highest peaks from the
+snowfall plot under 25mm every year. There is no substantial difference
+of snowfall values across the years.
