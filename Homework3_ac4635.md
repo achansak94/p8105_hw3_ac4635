@@ -119,10 +119,10 @@ tidy_accel_df=
   read.csv("./data/accel_data.csv") %>%
   janitor::clean_names() %>%
   pivot_longer(
-          activity_1:activity_1440,
-          names_to = "activity_minute", 
-          names_prefix = "activity_",
-          values_to = "activity_count") %>% 
+        activity_1:activity_1440,
+        names_to = "activity_minute", 
+        names_prefix = "activity_",
+        values_to = "activity_count") %>% 
   mutate(
     Weekdays = 
       case_when(day %in% c("Saturday", "Sunday") ~ "weekend",
@@ -252,7 +252,8 @@ tidy_accel_df %>%
       name = "Day",
       discrete = TRUE)+ 
   theme_set(theme_minimal() + theme(legend.position = "bottom")) +   
-  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1)) 
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1),
+        plot.title = element_text(hjust = 0.5))
 ```
 
 <img src="Homework3_ac4635_files/figure-gfm/Activity_Per_Day_Plot-1.png" width="90%" />
@@ -265,9 +266,10 @@ We can conclude from this busy graphic that our patient had increased
 activity between 6:00pm and 10:00pm on Monday, Wednesday, Friday and
 Saturday suggesting he may go on exercise on socializing with friends on
 these evenings. The patient seems to have morning activites between
-6:00am and 9:00am from Wednesday, Thursday and Saturday. Additionally,
-the lowest acitvity times are between 11:00pm and 6:00am suggesting that
-the patient gets roughly 6-7 hours of sleep or downtime a week.
+6:00am and 9:00am from Wednesday, Thursday and Saturday. This patient
+seems to be active around midday on Sunday, 12pm. Additionally, the
+lowest acitvity times are between 11:00pm and 6:00am suggesting that the
+patient gets roughly 6-7 hours of sleep or downtime a week.
 
 ## Problem 3
 
@@ -303,6 +305,15 @@ ny_noaa %>%
     ##  9 US1NYAB0025   215
     ## 10 US1NYAL0002   549
     ## # … with 737 more rows
+
+``` r
+count(distinct(ny_noaa, id))
+```
+
+    ## # A tibble: 1 x 1
+    ##       n
+    ##   <int>
+    ## 1   747
 
 ``` r
 # Date Range 
@@ -341,7 +352,7 @@ tail(date_summary, 5)
 
 ``` r
 # Percentage of NA's by column
-colMeans(is.na(ny_noaa))  
+colMeans(is.na(ny_noaa))
 ```
 
     ##        id      date      prcp      snow      snwd      tmax      tmin 
@@ -360,17 +371,19 @@ respectively.
 
 Below is a brief description of the original variables:
 
-id: Weather station ID date: Date of observation prcp: Precipitation
-(tenths of mm) snow: Snowfall (mm) snwd: Snow depth (mm) tmax: Maximum
-temperature (tenths of degrees C) tmin: Minimum temperature (tenths of
-degrees C)
+`id`: Weather station ID `date`: Date of observation `prcp`:
+Precipitation (tenths of mm) `snow`: Snowfall (mm) `snwd`: Snow depth
+(mm) `tmax`: Maximum temperature (tenths of degrees C) `tmin`: Minimum
+temperature (tenths of degrees C)
 
 There are 747 unique weather stations that may provide information on
 precipitation, snowfall, snow depth, min and max temperature on any
 given day from 1981-01-01 to 2010-21-31. Unfortunately, we have a lot of
 missing data. In particular, we found that the `tmin` and `tmax` columns
 have 43.71% of its observations as NA and 22.80% of the observations for
-the `snwd` variable as NA.
+the `snwd` variable as NA. ID and date have no missing observations.
+Precipitation and snowfall have 5.62% and 14.90 of its observations as
+NA, respectively.
 
 ## Problem 3 Part B
 
@@ -382,13 +395,13 @@ units. For snowfall, what are the most commonly observed values? Why?
 #Clean Dataset and Units
 noaa_data = ny_noaa %>% 
   janitor::clean_names() %>% 
-    separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+    separate(date, into = c("year", "month", "day")) %>% 
   mutate(
     prcp = prcp/10,
     snow = as.numeric(snow),
     snwd = as.numeric(snwd),
     tmax = as.numeric(tmax)/10,
-    tmin = as.numeric(tmin)/10)
+    tmin = as.numeric(tmin)/10) 
 
 # Commonly observed Snowfall values
 noaa_data %>% 
@@ -439,16 +452,15 @@ Avg_Max_Plot= noaa_data %>%
   select(id, year, month, avg_tmax) %>%
   ggplot(aes(x = year, y = avg_tmax, color = month)) + 
   geom_point(alpha = 0.6) +
-  geom_line(alpha = 0.5) +
-  geom_smooth(alpha = 0.3)+
   labs(
         title = "Avg. Max Temp. of each station across years",
         x = "Year",
         y = "Average Max Temperature (C)") +          
-  scale_color_manual(values=c("blue", "red")) +
+  scale_color_manual(values=c("blue", "orange")) +
   theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1),
         legend.position = "right") +
-  scale_x_discrete(breaks = seq(1981, 2010, 3))
+  scale_x_discrete(breaks = seq(1981, 2010, 3)) +
+  facet_grid(. ~ month)
 ```
 
     ## `summarise()` regrouping output by 'id', 'month' (override with `.groups` argument)
@@ -457,13 +469,7 @@ Avg_Max_Plot= noaa_data %>%
 Avg_Max_Plot
 ```
 
-    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-
-    ## Warning: Removed 5970 rows containing non-finite values (stat_smooth).
-
     ## Warning: Removed 5970 rows containing missing values (geom_point).
-
-    ## Warning: Removed 1492 row(s) containing missing values (geom_path).
 
 <img src="Homework3_ac4635_files/figure-gfm/Two_Panel_Plot-1.png" width="90%" />
 
@@ -471,9 +477,10 @@ Overall, the average maximum temperature in July is warmer than the
 average maximum temperature in January across the 30 years. In January,
 the average maximum temperature fluctuates between -10 to 10 degrees
 Celsius, while the average maximum temperature in July fluctuates
-between +20 and +30 degress Celsius.
+between +20 and +30 degress Celsius. The fluctuation between the January
+temperatures is much greater than the July temperatures.
 
-We observat that the recorded temperatures from the different stations
+We observe that the recorded temperatures from the different stations
 can vary as seen with the outliers. For example, one station in July,
 1988 recorded a much lower temperature than other stations.
 Additionally, we see outliers in January 1982, 2004, and 2005. One
@@ -520,13 +527,14 @@ tmin_tmax_plot
 snowfall_plot = 
   noaa_data %>% 
   filter(0 < snow & snow < 100) %>% 
-  ggplot(aes(x = snow, color = factor(year))) +
-  geom_density() +
+  ggplot(aes(x = year, y = snow, fill = year)) +
+  geom_boxplot() +
   labs(
     title = "Distribution of NY Snowfall Values (1981-2010)",
-    x = "Snowfall (mm)",
-    y = "Year") +
+    x = "Year",
+    y = "Snowfall (mm)") +
   theme(
+    axis.text.x = element_text(angle=90, vjust=0.5, hjust=1),
     plot.title = element_text(hjust = 0.5),
     legend.position = "none")
 
@@ -546,7 +554,9 @@ entire dataset. While we observe some outliers around -60 and 60 degrees
 Celsius, most of the points lie between -30 and 30 Celsius on the
 x-axis.
 
-On the right panel, we observe a distribution of snowfall values between
-0 and 100 degrees Celsius. We observe the two highest peaks from the
-snowfall plot under 25mm every year. There is no substantial difference
-of snowfall values across the years.
+On the right panel, we observe a boxplot of snowfall values between
+0-100mm by year from 1981-2010. Over the 30 years, we observe that the
+distribution between the snowfall values from year to year does not vary
+significantly other than the 1998 and 2006 year. There are sone outliers
+that we can see after 1998, but generally there is little variation of
+snowfall values across the years.
