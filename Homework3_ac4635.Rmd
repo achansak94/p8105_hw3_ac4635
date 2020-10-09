@@ -323,14 +323,16 @@ snowfall_plot =
   ggplot(aes(x = year, y = snow, fill = year)) +
   geom_boxplot() +
   labs(
-    title = "Distribution of NY Snowfall Values (1981-2010)",
+    title = "Distribution of NY Snowfall Values",
     x = "Year",
     y = "Snowfall (mm)") +
   theme(
     axis.text.x = element_text(angle=90, vjust=0.5, hjust=1),
     plot.title = element_text(hjust = 0.5),
-    legend.position = "none")
+    legend.position = "none") +
+  scale_x_discrete(breaks = seq(1981, 2010, 3)) 
 
+  
 tmin_tmax_plot + snowfall_plot
 ```
 
